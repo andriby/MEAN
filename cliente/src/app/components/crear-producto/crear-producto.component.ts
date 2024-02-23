@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { CProducto } from 'src/app/models/Producto.class';
+import { ProductoService } from 'src/app/services/producto.service';
 
 @Component({
   selector: 'app-crear-producto',
@@ -12,9 +13,10 @@ import { CProducto } from 'src/app/models/Producto.class';
 export class CrearProductoComponent implements OnInit {
 
   productoForm: FormGroup = new FormGroup({})
-  constructor(private _fb: FormBuilder, private _router: Router, private toastr: ToastrService ) {
+
+  constructor(private _fb: FormBuilder, private _router: Router, private toastr: ToastrService, private _producto: ProductoService ) {
     this.productoForm = this._fb.group({
-      producto: ['', Validators.required],
+      nombre: ['', Validators.required],
       categoria: ['', Validators.required],
       ubicacion: ['', Validators.required],
       precio: ['', Validators.required]
@@ -27,15 +29,16 @@ export class CrearProductoComponent implements OnInit {
 
   agregarProducto(){
     const PRODUCTO: CProducto = {
-      producto: this.productoForm.get('producto')?.value,
+      nombre: this.productoForm.get('nombre')?.value,
       categoria: this.productoForm.get('categoria')?.value,
       ubicacion: this.productoForm.get('ubicacion')?.value,
       precio: this.productoForm.get('precio')?.value
     }
-    this.showSuccess()
-    console.log(PRODUCTO)
+    // console.log(PRODUCTO)
+    this._producto.addProducto(PRODUCTO).subscribe(data => {
+      this.showSuccess()
+    })
     this._router.navigate(['/'])
-
 
   }
   showSuccess() {
