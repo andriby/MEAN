@@ -6,16 +6,11 @@ const conectarDB = async () => {
             useNewUrlParser: true,
             useUnifiedTopology: true
         });
-        console.log('Conexión exitosa a la base de datos');
+        console.log('DB Conectada');
     } catch (error) {
         console.error('Error de conexión a la base de datos:', error);
         process.exit(1); // Terminar la aplicación
     }
-
-    const Cat = mongoose.model('Cat', { name: String });
-    const kitty = new Cat({ name: 'Zildjian' });
-    kitty.save().then(() => console.log('meow'));
-    
 }
 
 module.exports = conectarDB;

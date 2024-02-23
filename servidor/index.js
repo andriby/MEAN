@@ -1,17 +1,14 @@
 const express = require('express')
 const conectarDB = require('./config/db')
-
-// Creamos el servidor
+const cors = require('cors')
 const app = express()
 
-// Definimos ruta principal 
-
-app.get('/', (req, res) =>{
-    res.send('Hola mundo')
-})
+conectarDB()
+app.use(cors())
+app.use(express.json())
 
 app.listen(4000, () =>{
     console.log('El servidor esta corriendo perfectamente')
 })
 
-conectarDB()
+app.use('/api/productos', require('./routes/producto')) 
