@@ -14,6 +14,9 @@ export class CrearProductoComponent implements OnInit {
 
   productoForm: FormGroup = new FormGroup({})
 
+  titulo: string = "CREAR PRODUCTO"
+  id: string | null
+  nId: string | null = ""
   constructor(private _fb: FormBuilder, private _router: Router, private toastr: ToastrService, private _producto: ProductoService, private route: ActivatedRoute) {
     this.productoForm = this._fb.group({
       nombre: ['', Validators.required],
@@ -21,16 +24,14 @@ export class CrearProductoComponent implements OnInit {
       ubicacion: ['', Validators.required],
       precio: ['', Validators.required]
     })
-
-    this.route.params.subscribe(params => {
-      const productId = params['producto._id`']; 
-      console.log(productId);
-      
-    });
+    this.id = this.route.snapshot.paramMap.get('id')
+    if (this.id) {
+      this.nId = this.id?.slice(1)
+    }
   }
 
   ngOnInit(): void {
-
+    this.esEditar()
   }
 
   agregarProducto(){
@@ -40,19 +41,47 @@ export class CrearProductoComponent implements OnInit {
       ubicacion: this.productoForm.get('ubicacion')?.value,
       precio: this.productoForm.get('precio')?.value
     }
-    this._producto.addProducto(PRODUCTO).subscribe({
-      next: () =>{
-        this.showSuccess()
-        this._router.navigate(['/'])
-      },
-      error:(err) =>{
-        console.error(err);
-      },
-    })
 
+    if (this.nId) {
+      this._producto.editPorducto(this.nId, PRODUCTO).subscribe({
+        next: () =>{
+          this.toastr.success('El producto fue editado con exito!', 'Producto editado!');
+          this._router.navigate(['/'])
+        },
+        error:(err) => {
+          console.error(err);        
+        },
+      })
+    } else{
+      this._producto.addProducto(PRODUCTO).subscribe({
+        next: () =>{
+          this.toastr.success('El producto fue registrado con exito!', 'Producto Registrado!');
+          this._router.navigate(['/'])
+        },
+        error:(err) =>{
+          console.error(err);
+        },
+      })
+    }
   }
-  showSuccess() {
-    this.toastr.success('El producto fue registrado con exito!', 'Producto Registrado!');
+
+  esEditar(){
+    if(this.nId !== null){
+      this.titulo = "EDITAR PRODUCTO"
+      this._producto.getProducto(this.nId).subscribe({
+        next: (producto) => {
+          this.productoForm = this._fb.group({
+            nombre: [producto.nombre, Validators.required],
+            categoria: [producto.categoria, Validators.required],
+            ubicacion: [producto.ubicacion, Validators.required],
+            precio: [producto.precio, Validators.required]
+          })
+        },
+        error:(err) => {
+          console.error(err);
+        },
+      })
+    }
   }
 
 }
